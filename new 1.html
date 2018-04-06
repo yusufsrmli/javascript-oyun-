@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" type="text/css" href="maze.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<body>
+<center>
+<canvas id="GameBoardCanvas" width="400px" height="400px">
+</canvas>
+<script>
+var canvas = $('#GameBoardCanvas');
+// oyun tahtası üzerinde 1==duvar, 0==yol , -1==bitiş
+
+var board =[
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [ 1, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    [ 0, 0, 0, 0, 1, 1, 1, 0, 1, 0],
+    [ 0, 1, 1, 0, 0, 0, 1, 0, 1, 0],
+    [ 0, 0, 1, 1, 1, 1, 1, 0, 1, 0],
+    [ 1, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+    [ 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [ 1, 0, 1, 0, 1, 0, 0, 1, 1, 0],
+    [-1, 0, 1, 0, 1, 1, 0, 0, 0, 0]
+	
+	];
+	
+	var myvar;
+	
+	var player ={
+	
+		x:0,
+		y:0
+		
+	};
+	
+	var takip ={
+		x:0,
+		y:0
+	
+	};
+	
+	function artırx(){
+	if(canMove(takip.x+1 , takip.y))
+
+		takip.x++;
+		
+		
+	}
+	
+	function artıry(){
+	if(canMove(takip.x,takip.y+1))
+		takip.y++;
+		
+	}
+	function azaltx(){
+	if(canMove(takip.x-1,takip.y))
+		takip.x--;
+	
+	}
+	function azalty(){
+	if(canMove(takip.x,takip.y-1))
+		takip.y--;
+		
+	}
+
+	function gameover(){
+	if(Math.sqrt(Math.pow((takip.x-player.x),2)+Math.pow((takip.y-player.y),2)) === 0){
+	alert("gameover");
+	player.x=0;
+		player.y=0;
+		takip.y=0;
+		takip.x=0;
+	}
+	}
+	
+	function kazanıldı(){
+			if(player.x==0 && player.y==9 ){
+		alert ("kazandınız");
+		player.x=0;
+		player.y=0;
+		takip.y=0;
+		takip.x=0;
+	}
+	
+	}
+	//oyun tahtasının çizilmesi
+
+function draw(){
+	var width = canvas.width();
+	var blockSize = width/board.length;
+	var ctx=canvas[0].getContext('2d');
+	ctx.setTransform(1,0,0,1,0,0);
+	ctx.clearRect(0,0,width,width);
+	ctx.fillStyle="white";
+	//döngü yardımıyla oyun tahtası ve bitiş noktası çiziliyor
+	
+	for(var y=0;y<board.length;y++){
+		for(var x=0;x<board[y].length;x++){
+			//duvar çizer
+			if(board[y][x]===1){
+				ctx.fillRect(x*blockSize,y*blockSize,blockSize,blockSize);
+				
+				
+			}
+			//bitiş noktasını çizer
+			else if(board[y][x]===-1){
+				ctx.beginPath();
+				ctx.lineWidth=5;
+				ctx.strokeStyle="darkgray";
+				ctx.moveTo(x*blockSize,y*blockSize);
+				ctx.lineTo((x+1)*blockSize,(y+1)*blockSize);
+				ctx.moveTo(x*blockSize,(y+1)*blockSize);
+				ctx.lineTo((x+1)*blockSize,y*blockSize);
+				ctx.stroke();
+			}
+			}
+			}
+	//oyuncuyu çizer
+	ctx.beginPath();
+	var half=blockSize/2;
+	ctx.fillStyle="black";
+	ctx.arc(player.x*blockSize+half,player.y*blockSize+half,half,0,2*Math.PI);
+	ctx.fill();
+	
+	ctx.beginPath();
+	var half=blockSize/2;
+	ctx.fillStyle="red";
+	ctx.arc(takip.x*blockSize+half,takip.y*blockSize+half,half,0,2*Math.PI);
+	ctx.fill();
+	
+	
+}
+
+  //hareketin gerçekleştirilebilir olup olmadığını kontrol eden fonksiyon
+	
+function canMove(x,y){
+	return (y>=0) && (y<board.length) && (x>=0) && (x<board[y].length) && (board[y][x]!=1);
+	
+}
+
+$(document).keyup(function(e){
+	if((e.which == 38) && canMove(player.x,player.y-1)){ //yukarı yönü
+	player.y--;
+	myvar=setTimeout(azalty,1000);
+	gameover();
+	
+	}
+	else if((e.which == 40) && canMove(player.x,player.y+1)){ //aşağı yönü
+	player.y++;
+	myvar=setTimeout(artıry,1000);
+	gameover();
+	}
+	else if((e.which==37) && canMove(player.x-1,player.y)){ 
+		player.x--;
+		myvar=setTimeout(azaltx,1000);
+		gameover();
+		}
+	else if((e.which == 39) && canMove(player.x+1 , player.y)){ 
+		player.x++;
+		myvar=setTimeout(artırx,1000);
+		gameover();
+	}
+	
+	kazanıldı();
+	
+	
+
+		
+	draw();
+	
+	e.preventDefault();
+	
+	});
+
+draw();
+</script>
+</center>
+</body>
+
+</html>
